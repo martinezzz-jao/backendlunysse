@@ -1,25 +1,25 @@
 from sqlalchemy.orm import Session
-from core.database import sessionLocal, engine
+from core.database import SessionLocal, engine
 from models.models import Base, User, Patient, Appointment, Request, UserType, AppointmentStatus, RequestStatus
-from Utils import get_password_hash
-from datetime import date, datetime, timedelta
+from utils import get_password_hash
+from datetime import date, timedelta
 import json
 
-# Cria as tabelas
+# Cria as tabelas no banco (se ainda não existirem)
 Base.metadata.create_all(bind=engine)
 
+
 def seed_database():
-    db = sessionLocal()
-    
+    db = SessionLocal()
     try:
-        # Limpa dados existentes
+        # 🔄 Limpa dados existentes
         db.query(Request).delete()
         db.query(Appointment).delete()
         db.query(Patient).delete()
         db.query(User).delete()
         db.commit()
-        
-        # Cria usuários (psicólogos e pacientes)
+
+        # 👩‍⚕️ Usuários (Psicólogos e Pacientes)
         users_data = [
             {
                 "id": 2,
@@ -56,14 +56,12 @@ def seed_database():
                 "name": "Maria Santos"
             }
         ]
-        
+
         for user_data in users_data:
-            user = User(**user_data)
-            db.add(user)
-        
+            db.add(User(**user_data))
         db.commit()
-        
-        # Cria pacientes
+
+        # 👩‍🔬 Pacientes
         patients_data = [
             {
                 "id": 20,
@@ -106,14 +104,12 @@ def seed_database():
                 "psychologist_id": 2
             }
         ]
-        
+
         for patient_data in patients_data:
-            patient = Patient(**patient_data)
-            db.add(patient)
-        
+            db.add(Patient(**patient_data))
         db.commit()
-        
-        # Cria agendamentos
+
+        # 📅 Agendamentos
         today = date.today()
         appointments_data = [
             {
@@ -153,14 +149,12 @@ def seed_database():
                 "full_report": "Estabelecimento de vínculo terapêutico."
             }
         ]
-        
+
         for appointment_data in appointments_data:
-            appointment = Appointment(**appointment_data)
-            db.add(appointment)
-        
+            db.add(Appointment(**appointment_data))
         db.commit()
-        
-        # Cria solicitações
+
+        # 📩 Solicitações
         requests_data = [
             {
                 "id": 1,
@@ -187,20 +181,20 @@ def seed_database():
                 "status": RequestStatus.PENDENTE
             }
         ]
-        
+
         for request_data in requests_data:
-            request = Request(**request_data)
-            db.add(request)
-        
+            db.add(Request(**request_data))
         db.commit()
-        
+
         print("✅ Dados de teste inseridos com sucesso!")
-        
+
     except Exception as e:
         print(f"❌ Erro ao inserir dados: {e}")
         db.rollback()
+
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     seed_database()
